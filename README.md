@@ -162,6 +162,12 @@ cilium hubble enable --ui
 cilium hubble ui
 ```
 
+### Sock Shop install
+
+```sh
+kubectl create -f https://raw.githubusercontent.com/microservices-demo/microservices-demo/master/deploy/kubernetes/complete-demo.yaml
+```
+
 ### tetragon install
 
 ```sh
