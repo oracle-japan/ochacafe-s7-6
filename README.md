@@ -168,6 +168,8 @@ cilium hubble ui
 kubectl create -f https://raw.githubusercontent.com/microservices-demo/microservices-demo/master/deploy/kubernetes/complete-demo.yaml
 ```
 
+## Get Started 3
+
 ### tetragon install
 
 ```sh
