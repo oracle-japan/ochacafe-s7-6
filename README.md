@@ -170,6 +170,20 @@ kubectl create -f https://raw.githubusercontent.com/microservices-demo/microserv
 
 ## Get Started 3
 
+### Helm install
+
+```sh
+curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
+```
+
+```sh
+chmod 700 get_helm.sh
+```
+
+```sh
+./get_helm.sh
+```
+
 ### tetragon install
 
 ```sh
