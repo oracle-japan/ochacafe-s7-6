@@ -168,6 +168,297 @@ cilium hubble ui
 kubectl create -f https://raw.githubusercontent.com/microservices-demo/microservices-demo/master/deploy/kubernetes/complete-demo.yaml
 ```
 
+
+### Cilium & Hubble Demo
+
+サンプルアプリケーションを展開します。
+
+```sh
+kubectl create -f https://raw.githubusercontent.com/cilium/cilium/1.14.2/examples/minikube/http-sw-app.yaml
+```
+```sh
+NAME                         READY   STATUS    RESTARTS   AGE
+deathstar-7848d6c4d5-4zck4   1/1     Running   0          6s
+deathstar-7848d6c4d5-56s9d   1/1     Running   0          6s
+tiefighter                   1/1     Running   0          6s
+xwing                        1/1     Running   0          5s
+```
+
+私用するオブジェクトが Running であることを確認します。
+
+```sh
+kubectl get pods,svc
+```
+```sh
+NAME                             READY   STATUS    RESTARTS   AGE
+pod/deathstar-7848d6c4d5-4zck4   1/1     Running   0          6m54s
+pod/deathstar-7848d6c4d5-56s9d   1/1     Running   0          6m54s
+pod/tiefighter                   1/1     Running   0          6m54s
+pod/xwing                        1/1     Running   0          6m53s
+
+NAME                 TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)   AGE
+service/deathstar    ClusterIP   10.96.233.135   <none>        80/TCP    6m54s
+service/kubernetes   ClusterIP   10.96.0.1       <none>        443/TCP   5d19h
+```
+
+各ノードで展開されている cilium エージェントの Pod 名を確認します。
+
+```sh
+kubectl -n kube-system get pods -l k8s-app=cilium -o wide
+```
+```sh
+NAME           READY   STATUS    RESTARTS      AGE     IP           NODE                 NOMINATED NODE   READINESS GATES
+cilium-kf87b   1/1     Running   1 (24m ago)   5d19h   172.18.0.3   kind-worker2         <none>           <none>
+cilium-kl46t   1/1     Running   1 (24m ago)   5d19h   172.18.0.2   kind-worker3         <none>           <none>
+cilium-mhqd9   1/1     Running   1 (24m ago)   5d19h   172.18.0.4   kind-worker          <none>           <none>
+cilium-zt76c   1/1     Running   1 (24m ago)   5d19h   172.18.0.5   kind-control-plane   <none>           <none>
+```
+
+1つのエージェント Pod 内でネットワークポリシーの状況を確認します。ネットワークポリシーを適用していないため、 Disabled となります。
+
+```sh
+kubectl -n kube-system exec cilium-kf87b -- cilium endpoint list
+```
+```sh
+Defaulted container "cilium-agent" out of: cilium-agent, config (init), mount-cgroup (init), apply-sysctl-overwrites (init), mount-bpf-fs (init), clean-cilium-state (init), install-cni-binaries (init)
+ENDPOINT   POLICY (ingress)   POLICY (egress)   IDENTITY   LABELS (source:key[=value])                                                  IPv6   IPv4           STATUS   
+           ENFORCEMENT        ENFORCEMENT                                                                                                                     
+178        Disabled           Disabled          51425      k8s:app.kubernetes.io/name=xwing                                                    10.244.3.205   ready   
+                                                           k8s:class=xwing                                                                                            
+                                                           k8s:io.cilium.k8s.namespace.labels.kubernetes.io/metadata.name=default                                     
+                                                           k8s:io.cilium.k8s.policy.cluster=kind-kind                                                                 
+                                                           k8s:io.cilium.k8s.policy.serviceaccount=default                                                            
+                                                           k8s:io.kubernetes.pod.namespace=default                                                                    
+                                                           k8s:org=alliance                                                                                           
+274        Disabled           Disabled          3872       k8s:io.cilium.k8s.namespace.labels.kubernetes.io/metadata.name=sock-shop            10.244.3.53    ready   
+                                                           k8s:io.cilium.k8s.policy.cluster=kind-kind                                                                 
+                                                           k8s:io.cilium.k8s.policy.serviceaccount=default                                                            
+                                                           k8s:io.kubernetes.pod.namespace=sock-shop                                                                  
+                                                           k8s:name=user                                                                                              
+1034       Disabled           Disabled          18587      k8s:app.kubernetes.io/name=hubble-ui                                                10.244.3.176   ready   
+                                                           k8s:app.kubernetes.io/part-of=cilium                                                                       
+                                                           k8s:io.cilium.k8s.namespace.labels.kubernetes.io/metadata.name=kube-system                                 
+                                                           k8s:io.cilium.k8s.policy.cluster=kind-kind                                                                 
+                                                           k8s:io.cilium.k8s.policy.serviceaccount=hubble-ui                                                          
+                                                           k8s:io.kubernetes.pod.namespace=kube-system                                                                
+                                                           k8s:k8s-app=hubble-ui                                                                                      
+1532       Disabled           Disabled          37043      k8s:io.cilium.k8s.namespace.labels.kubernetes.io/metadata.name=sock-shop            10.244.3.172   ready   
+                                                           k8s:io.cilium.k8s.policy.cluster=kind-kind                                                                 
+                                                           k8s:io.cilium.k8s.policy.serviceaccount=default                                                            
+                                                           k8s:io.kubernetes.pod.namespace=sock-shop                                                                  
+                                                           k8s:name=front-end                                                                                         
+1554       Disabled           Disabled          4          reserved:health                                                                     10.244.3.243   ready   
+2505       Disabled           Disabled          65204      k8s:io.cilium.k8s.namespace.labels.kubernetes.io/metadata.name=sock-shop            10.244.3.49    ready   
+                                                           k8s:io.cilium.k8s.policy.cluster=kind-kind                                                                 
+                                                           k8s:io.cilium.k8s.policy.serviceaccount=default                                                            
+                                                           k8s:io.kubernetes.pod.namespace=sock-shop                                                                  
+                                                           k8s:name=catalogue                                                                                         
+2812       Disabled           Disabled          5072       k8s:io.cilium.k8s.namespace.labels.kubernetes.io/metadata.name=sock-shop            10.244.3.97    ready   
+                                                           k8s:io.cilium.k8s.policy.cluster=kind-kind                                                                 
+                                                           k8s:io.cilium.k8s.policy.serviceaccount=default                                                            
+                                                           k8s:io.kubernetes.pod.namespace=sock-shop                                                                  
+                                                           k8s:name=rabbitmq                                                                                          
+3372       Disabled           Disabled          1          reserved:host                                                                                      ready
+```
+
+xwing と tiefighter Pod から deathstar Pod にアクセスを試みます。ネットワークポリシー適用前なので、「Ship Llanded」と表示されて、xwing と tiefighter Pod は、deathstar Pod にアクセスできます。
+
+```sh
+kubectl exec xwing -- curl -s -XPOST deathstar.default.svc.cluster.local/v1/request-landing
+```
+```sh
+Ship landed
+```
+
+```sh
+kubectl exec tiefighter -- curl -s -XPOST deathstar.default.svc.cluster.local/v1/request-landing
+```
+```sh
+Ship landed
+```
+
+hubble でも forwarded の表示を確認できます。
+
+![hubble 1](./images/02.png)
+
+L3/L4 ポリシーを適用します。「org=empire」というラベルを持つ tiefighter Pod は、deathstar Pod にアクセスできますが、ラベルを持たない xwing Pod はアクセスできなくなります。
+
+ポリシーの内容は、以下です。
+
+```sh
+apiVersion: "cilium.io/v2"
+kind: CiliumNetworkPolicy
+metadata:
+  name: "rule1"
+spec:
+  description: "L3-L4 policy to restrict deathstar access to empire ships only"
+  endpointSelector:
+    matchLabels:
+      org: empire
+      class: deathstar
+  ingress:
+  - fromEndpoints:
+    - matchLabels:
+        org: empire
+    toPorts:
+    - ports:
+      - port: "80"
+        protocol: TCP
+```
+
+CiliumNetworkPolicies は、「endpointSelector」を使用して Pod のラベルを照合し、ポリシーが適用されるソースと宛先を識別します。上記のポリシーは、ラベル (org=empire) を持つポッドからラベル (org=empire、class=deathstar) を持つ deathstar Pod に TCP ポート 80 で送信されるトラフィックをホワイトリストに登録します。
+
+```sh
+kubectl create -f https://raw.githubusercontent.com/cilium/cilium/1.14.2/examples/minikube/sw_l3_l4_policy.yaml
+```
+```sh
+ciliumnetworkpolicy.cilium.io/rule1 created
+```
+
+想定通り、tiefighter Pod は、deathstar Pod にアクセスできますが、xwing Pod は悪です出来ません。
+
+```sh
+kubectl exec tiefighter -- curl -s -XPOST deathstar.default.svc.cluster.local/v1/request-landing
+```
+```sh
+Ship landed
+```
+
+アクセスできないため、Ctrl + c で強制終了します。
+
+```sh
+kubectl exec xwing -- curl -s -XPOST deathstar.default.svc.cluster.local/v1/request-landing
+```
+
+hubble でも dropped と表示されます。
+
+![hubble 2](./images/03.png)
+
+cilium endpoint list を再度実行すると、ラベル org=empire および class=deathstar を持つポッドで、上記のポリシーに従ってイングレス ポリシーの適用が有効になっていいます。
+
+```sh
+kubectl -n kube-system exec cilium-kl46t -- cilium endpoint list
+```
+```sh
+Defaulted container "cilium-agent" out of: cilium-agent, config (init), mount-cgroup (init), apply-sysctl-overwrites (init), mount-bpf-fs (init), clean-cilium-state (init), install-cni-binaries (init)
+ENDPOINT   POLICY (ingress)   POLICY (egress)   IDENTITY   LABELS (source:key[=value])                                                  IPv6   IPv4           STATUS   
+           ENFORCEMENT        ENFORCEMENT                                                                                                                     
+13         Disabled           Disabled          12910      k8s:io.cilium.k8s.namespace.labels.kubernetes.io/metadata.name=sock-shop            10.244.1.70    ready   
+                                                           k8s:io.cilium.k8s.policy.cluster=kind-kind                                                                 
+                                                           k8s:io.cilium.k8s.policy.serviceaccount=default                                                            
+                                                           k8s:io.kubernetes.pod.namespace=sock-shop                                                                  
+                                                           k8s:name=catalogue-db                                                                                      
+240        Enabled            Disabled          10798      k8s:app.kubernetes.io/name=deathstar                                                10.244.1.100   ready   
+                                                           k8s:class=deathstar                                                                                        
+                                                           k8s:io.cilium.k8s.namespace.labels.kubernetes.io/metadata.name=default                                     
+                                                           k8s:io.cilium.k8s.policy.cluster=kind-kind                                                                 
+                                                           k8s:io.cilium.k8s.policy.serviceaccount=default                                                            
+                                                           k8s:io.kubernetes.pod.namespace=default
+・
+・＜省略＞
+・
+```
+
+```sh
+kubectl -n kube-system exec cilium-mhqd9 -- cilium endpoint list
+```
+```sh
+Defaulted container "cilium-agent" out of: cilium-agent, config (init), mount-cgroup (init), apply-sysctl-overwrites (init), mount-bpf-fs (init), clean-cilium-state (init), install-cni-binaries (init)
+ENDPOINT   POLICY (ingress)   POLICY (egress)   IDENTITY   LABELS (source:key[=value])                                                         IPv6   IPv4           STATUS   
+           ENFORCEMENT        ENFORCEMENT                                                                                                                            
+86         Enabled            Disabled          10798      k8s:app.kubernetes.io/name=deathstar                                                       10.244.2.91    ready   
+                                                           k8s:class=deathstar                                                                                               
+                                                           k8s:io.cilium.k8s.namespace.labels.kubernetes.io/metadata.name=default                                            
+                                                           k8s:io.cilium.k8s.policy.cluster=kind-kind                                                                        
+                                                           k8s:io.cilium.k8s.policy.serviceaccount=default                                                                   
+                                                           k8s:io.kubernetes.pod.namespace=default                                                                           
+                                                           k8s:org=empire                                                                                                    
+・
+・＜省略＞
+・
+```
+
+HTTP 対応 L7 ポリシーの適用とテストを行います。
+
+以下のポリシーは、tiefighter Pod からの HTTP POST における /v1/request-landing という URL への API 呼び出しのみを許可し、それ以外は拒否するポリシーです。
+適用すると、tiefighter Pod から HTTP PUT における /v1/exhaust-port への通信および xwing Pod からの通信を行いますが、拒否されます。
+
+```sh
+apiVersion: "cilium.io/v2"
+kind: CiliumNetworkPolicy
+metadata:
+  name: "rule1"
+spec:
+  description: "L7 policy to restrict access to specific HTTP call"
+  endpointSelector:
+    matchLabels:
+      org: empire
+      class: deathstar
+  ingress:
+  - fromEndpoints:
+    - matchLabels:
+        org: empire
+    toPorts:
+    - ports:
+      - port: "80"
+        protocol: TCP
+      rules:
+        http:
+        - method: "POST"
+          path: "/v1/request-landing"
+```
+
+ポリシーを適用します。
+
+```sh
+kubectl apply -f https://raw.githubusercontent.com/cilium/cilium/1.14.2/examples/minikube/sw_l3_l4_l7_policy.yaml
+```
+```sh
+ciliumnetworkpolicy.cilium.io/rule1 configured
+```
+
+HTTP POST 通信は通ります。
+
+```sh
+kubectl exec tiefighter -- curl -s -XPOST deathstar.default.svc.cluster.local/v1/request-landing
+```
+```sh
+Ship landed
+```
+
+```sh
+kubectl exec tiefighter -- curl -s -XPUT deathstar.default.svc.cluster.local/v1/exhaust-port
+```
+```sh
+Access denied
+```
+
+hubble でも両方の状況を確認できます。
+
+![hubble 3](./images/04.png)
+
+ラベル org=empire のない Pod からのトラフィックは引き続き Dropped となります。
+
+![hubble 4](./images/05.png)
+
+サンプルアプリケーションとネットワークポリシーを削除します。
+
+```sh
+kubectl delete -f https://raw.githubusercontent.com/cilium/cilium/1.14.2/examples/minikube/http-sw-app.yaml
+```
+```sh
+service "deathstar" deleted
+deployment.apps "deathstar" deleted
+pod "tiefighter" deleted
+pod "xwing" deleted
+```
+```sh
+kubectl delete cnp rule1
+```
+```sh
+ciliumnetworkpolicy.cilium.io "rule1" deleted
+```
+
 ## Get Started 3
 
 ### Helm install
