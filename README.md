@@ -263,6 +263,8 @@ ENDPOINT   POLICY (ingress)   POLICY (egress)   IDENTITY   LABELS (source:key[=v
 
 xwing と tiefighter Pod から deathstar Pod にアクセスを試みます。ネットワークポリシー適用前なので、「Ship Llanded」と表示されて、xwing と tiefighter Pod は、deathstar Pod にアクセスできます。
 
+![Cilium & Hubble Demo](images/06.png)
+
 ```sh
 kubectl exec xwing -- curl -s -XPOST deathstar.default.svc.cluster.local/v1/request-landing
 ```
@@ -281,7 +283,11 @@ hubble でも forwarded の表示を確認できます。
 
 ![hubble 1](./images/02.png)
 
-L3/L4 ポリシーを適用します。「org=empire」というラベルを持つ tiefighter Pod は、deathstar Pod にアクセスできますが、ラベルを持たない xwing Pod はアクセスできなくなります。
+### L4 Policy with Cilium and Kubernetes
+
+![L4 Policy with Cilium and Kubernetes](images/07.png)
+
+L4 ポリシーを適用します。「org=empire」というラベルを持つ tiefighter Pod は、deathstar Pod にアクセスできますが、ラベルを持たない xwing Pod はアクセスできなくなります。
 
 ポリシーの内容は、以下です。
 
@@ -378,6 +384,10 @@ ENDPOINT   POLICY (ingress)   POLICY (egress)   IDENTITY   LABELS (source:key[=v
 ・
 ```
 
+### L7 Policy with Cilium and Kubernetes
+
+![L7 Policy with Cilium and Kubernetes](images/08.png)
+
 HTTP 対応 L7 ポリシーの適用とテストを行います。
 
 以下のポリシーは、tiefighter Pod からの HTTP POST における /v1/request-landing という URL への API 呼び出しのみを許可し、それ以外は拒否するポリシーです。
@@ -417,7 +427,7 @@ kubectl apply -f https://raw.githubusercontent.com/cilium/cilium/1.14.2/examples
 ciliumnetworkpolicy.cilium.io/rule1 configured
 ```
 
-HTTP POST 通信は通ります。
+HTTP POST 通信は通りますが、HTTP PUT 通信は拒否されます。
 
 ```sh
 kubectl exec tiefighter -- curl -s -XPOST deathstar.default.svc.cluster.local/v1/request-landing
@@ -438,6 +448,10 @@ hubble でも両方の状況を確認できます。
 ![hubble 3](./images/04.png)
 
 ラベル org=empire のない Pod からのトラフィックは引き続き Dropped となります。
+
+```sh
+kubectl exec xwing -- curl -s -XPOST deathstar.default.svc.cluster.local/v1/request-landing
+```
 
 ![hubble 4](./images/05.png)
 
