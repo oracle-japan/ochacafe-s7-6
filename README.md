@@ -162,13 +162,6 @@ cilium hubble enable --ui
 cilium hubble ui
 ```
 
-### Sock Shop install
-
-```sh
-kubectl create -f https://raw.githubusercontent.com/microservices-demo/microservices-demo/master/deploy/kubernetes/complete-demo.yaml
-```
-
-
 ### Cilium & Hubble Demo
 
 サンプルアプリケーションを展開します。
@@ -472,6 +465,99 @@ kubectl delete cnp rule1
 ```sh
 ciliumnetworkpolicy.cilium.io "rule1" deleted
 ```
+
+### Monitoring of Sock Shop by Hubble
+
+### Sock Shop install
+
+```sh
+kubectl create -f https://raw.githubusercontent.com/microservices-demo/microservices-demo/master/deploy/kubernetes/complete-demo.yaml
+```
+```sh
+namespace/sock-shop created
+Warning: spec.template.spec.nodeSelector[beta.kubernetes.io/os]: deprecated since v1.14; use "kubernetes.io/os" instead
+deployment.apps/carts created
+service/carts created
+deployment.apps/carts-db created
+service/carts-db created
+deployment.apps/catalogue created
+service/catalogue created
+deployment.apps/catalogue-db created
+service/catalogue-db created
+deployment.apps/front-end created
+service/front-end created
+deployment.apps/orders created
+service/orders created
+deployment.apps/orders-db created
+service/orders-db created
+deployment.apps/payment created
+service/payment created
+deployment.apps/queue-master created
+service/queue-master created
+deployment.apps/rabbitmq created
+service/rabbitmq created
+deployment.apps/session-db created
+service/session-db created
+deployment.apps/shipping created
+service/shipping created
+deployment.apps/user created
+service/user created
+deployment.apps/user-db created
+service/user-db created
+```
+
+### Port-forward Sock Shop
+
+ポートフォワーディングするために front-end Pod 名を調べます。
+
+```sh
+kubectl get pods -n sock-shop
+```
+```sh
+NAME                            READY   STATUS    RESTARTS   AGE
+carts-5bb979cb6d-mkrmw          1/1     Running   0          11m
+carts-db-6d88679f9d-qhwjx       1/1     Running   0          11m
+catalogue-7c89c4b8b7-ktt8m      1/1     Running   0          11m
+catalogue-db-6d76c95d76-ps2cs   1/1     Running   0          11m
+front-end-5d7b595bcd-2crfh      1/1     Running   0          11m
+orders-d5f745cc6-k7bvm          1/1     Running   0          11m
+orders-db-688cc755dd-bh7rw      1/1     Running   0          11m
+payment-66d9c6c5c8-czxqm        1/1     Running   0          11m
+queue-master-78b6f85bb7-k65pd   1/1     Running   0          11m
+rabbitmq-55c946cb56-zfcpk       2/2     Running   0          11m
+session-db-9dc55b5b-fb7gh       1/1     Running   0          11m
+shipping-78db6c6958-t5j74       1/1     Running   0          11m
+user-5c8d59bcd4-pv6w7           1/1     Running   0          11m
+user-db-758477f574-q6ztz        1/1     Running   0          11m
+```
+
+front-end Pod のコンテナポート番号は、8079 なので、そのポート番号でフォワーディングします。
+新しいコンソールを起動して実行します。
+
+```sh
+kubectl port-forward front-end-5d7b595bcd-2crfh -n sock-shop 8079:8079
+```
+```sh
+Forwarding from 127.0.0.1:8079 -> 8079
+Forwarding from [::1]:8079 -> 8079
+Handling connection for 8079
+・
+・
+・
+```
+
+VSCodeでポート設定をすると、自動でブラウザが起動して、以下のURLにアクセスします。
+
+http://localhost:8079/
+
+![Sock Shop](./images/09.png)
+
+http://localhost:12000/ hubble ui で sock-shop をクリックするとリアルタイムの状況を確認できます。
+
+![Sock Shop & hubble 1](./images/10.png)
+
+![Sock Shop & hubble 2](./images/11.png)
+
 
 ## Get Started 3
 
