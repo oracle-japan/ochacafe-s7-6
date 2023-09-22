@@ -611,11 +611,6 @@ tetra version
 
 ### Tetragon Demo
 
-sample source deploy
-```sh
-kubectl create -f https://raw.githubusercontent.com/cilium/cilium/v1.11/examples/minikube/http-sw-app.yaml
-```
-
 #### Process execution
 
 Console A
@@ -636,6 +631,9 @@ kubectl exec -it xwing -- /bin/bash
 ```
 ```sh
 whoami
+```
+```sh
+exit
 ```
 
 JSON View
@@ -712,6 +710,18 @@ kubectl logs -n kube-system -l app.kubernetes.io/name=tetragon -c export-stdout 
 💥 exit    default/xwing /bin/bash  0
 ```
 
+JSON View
+
+※Crt ＋C 実行後
+
+```sh
+kubectl logs -n kube-system -l app.kubernetes.io/name=tetragon -c export-stdout -f | jq 'select(.process_kprobe.process.pod.name=="xwing" or .process_kprobe.process.pod.name=="xwing")'
+```
+
+Console A
+
+TracingPolicy を削除します。
+
 ```sh
 kubectl delete -f https://raw.githubusercontent.com/cilium/tetragon/main/examples/tracingpolicy/filename_monitoring.yaml
 ```
@@ -728,10 +738,6 @@ kubectl apply -f https://raw.githubusercontent.com/cilium/tetragon/main/examples
 kubectl exec -it xwing -- curl http://cilium.io
 ```
 
-```sh
-kubectl delete -f https://raw.githubusercontent.com/cilium/tetragon/main/examples/tracingpolicy/tcp-connect.yaml
-```
-
 Console B
 
 ```sh
@@ -743,3 +749,20 @@ kubectl logs -n kube-system -l app.kubernetes.io/name=tetragon -c export-stdout 
 🧹 close   default/xwing /usr/bin/curl tcp 10.244.3.43:36790 -> 104.198.14.52:80 
 💥 exit    default/xwing /usr/bin/curl http://cilium.io 0
 ```
+
+JSON View
+
+※Crt ＋C 実行後
+
+```sh
+kubectl logs -n kube-system -l app.kubernetes.io/name=tetragon -c export-stdout -f | jq 'select(.process_kprobe.process.pod.name=="xwing" or .process_kprobe.process.pod.name=="xwing")'
+```
+
+Console A
+
+TracingPolicy を削除します。
+
+```sh
+kubectl delete -f https://raw.githubusercontent.com/cilium/tetragon/main/examples/tracingpolicy/tcp-connect.yaml
+```
+
