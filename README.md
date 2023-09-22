@@ -613,6 +613,8 @@ tetra version
 
 #### Process execution
 
+![Process execution](./images/12.png)
+
 Console A
 
 ```sh
@@ -647,6 +649,8 @@ kubectl logs -n kube-system -l app.kubernetes.io/name=tetragon -c export-stdout 
 
 #### Privileged execution
 
+![Privileged execution](./images/13.png)
+
 Console A
 
 ```sh
@@ -677,6 +681,8 @@ kubectl logs -n kube-system -l app.kubernetes.io/name=tetragon -c export-stdout 
 ```
 
 #### Filename access
+
+![Filename access](./images/14.png)
 
 Console A
 
@@ -727,6 +733,8 @@ kubectl delete -f https://raw.githubusercontent.com/cilium/tetragon/main/example
 ```
 
 #### Network observability
+
+![Network observability](./images/15.png)
 
 Console A
 
