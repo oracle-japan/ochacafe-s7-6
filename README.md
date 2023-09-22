@@ -5,6 +5,109 @@
 
 環境は、Oracle Cloud Infrastructure（OCI）前提です。
 
+## Get Started 1
+
+### Install PIXIE CLI on OCI Cloud Shell
+
+```sh
+curl -o px https://storage.googleapis.com/pixie-dev-public/cli/latest/cli_linux_amd64
+```
+
+```sh
+chmod +x px
+```
+
+```sh
+mkdir $home/bin
+```
+
+```sh
+export PATH="$PATH:$home/bin"
+```
+
+```sh
+px version
+```
+```sh
+Pixie CLI
+0.8.2+Distribution.401c92c.20230530183620.1.jenkins
+```
+
+### Install PIXIE on OKE
+
+```sh
+px deploy
+```
+```sh
+Pixie CLI
+
+Running Cluster Checks:
+ ✔    Kernel version > 4.14.0 
+ ✔    Cluster type is supported 
+ ✔    K8s version > 1.16.0 
+ ✔    Kubectl > 1.10.0 is present 
+ ✔    User can create namespace 
+ ✕    Cluster type is in list of known supported types  ERR: Cluster type is not in list of known supported cluster types. Please see: https://docs.px.dev/installing-pixie/requirements/
+Some cluster checks failed. Pixie may not work properly on your cluster. Continue with deploy? (y/n) [y] : y
+Installing Vizier version: 0.14.6
+Generating YAMLs for Pixie
+Deploying Pixie to the following cluster: context-cap6yc5rqea
+Is the cluster correct? (y/n) [y] : y
+Found 3 nodes
+ ✔    Installing OLM CRDs 
+ ✔    Deploying OLM 
+ ✔    Deploying Pixie OLM Namespace 
+ ✔    Installing Vizier CRD 
+ ✔    Deploying OLM Catalog 
+ ✔    Deploying OLM Subscription 
+ ✔    Creating namespace 
+ ✔    Deploying Vizier 
+ ✔    Waiting for Cloud Connector to come online 
+Waiting for Pixie to pass healthcheck
+ ✔    Wait for PEMs/Kelvin 
+ ✔    Wait for PEMs/Kelvin 
+ ✔    Wait for healthcheck 
+
+==> Next Steps:
+
+Run some scripts using the px cli. For example: 
+- px script list : to show pre-installed scripts.
+- px run px/service_stats : to run service info for sock-shop demo application (service selection coming soon!).
+
+Check out our docs: https://docs.withpixie.ai:443.
+```
+
+### Install Sock Shop on OKE
+
+```sh
+px demo deploy px-sock-shop
+```
+```sh
+Pixie CLI
+Deploying demo app px-sock-shop to the following cluster: context-cap6yc5rqea
+Is the cluster correct? (y/n) [y] : y
+ ✔    Creating namespace px-sock-shop 
+ ✔    Deploying px-sock-shop YAMLs 
+Successfully deployed demo app px-sock-shop to cluster context-cap6yc5rqea.
+==> Next Steps:
+
+Load testing has been automatically launched for px-sock-shop. If you want to visit the px-sock-shop site,
+ run 'kubectl -n px-sock-shop get svc front-end --watch' to get the external IP.
+ When using minikube, run 'minikube tunnel' in order to ensure the external IP is accessible.
+ ```
+
+EXTERNAL-IP アドレスを確認後、ブラウザでアクセスします。
+
+```sh
+kubectl -n px-sock-shop get svc front-end -w
+```
+```sh
+NAME        TYPE           CLUSTER-IP    EXTERNAL-IP     PORT(S)        AGE
+front-end   LoadBalancer   10.96.71.65   xxx.xx.xxx.xx   80:30001/TCP   47s
+```
+
+![Sock Shop](images/16.png)
+
 ## Get Started 2
 
 デモ環境概要図
