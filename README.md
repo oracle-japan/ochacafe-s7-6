@@ -551,17 +551,8 @@ kubectl exec xwing -- curl -s -XPOST deathstar.default.svc.cluster.local/v1/requ
 
 ![hubble 4](./images/05.png)
 
-サンプルアプリケーションとネットワークポリシーを削除します。
+ネットワークポリシーを削除します。
 
-```sh
-kubectl delete -f https://raw.githubusercontent.com/cilium/cilium/1.14.2/examples/minikube/http-sw-app.yaml
-```
-```sh
-service "deathstar" deleted
-deployment.apps "deathstar" deleted
-pod "tiefighter" deleted
-pod "xwing" deleted
-```
 ```sh
 kubectl delete cnp rule1
 ```
@@ -875,5 +866,17 @@ TracingPolicy を削除します。
 
 ```sh
 kubectl delete -f https://raw.githubusercontent.com/cilium/tetragon/main/examples/tracingpolicy/tcp-connect.yaml
+```
+
+サンプルアプリケーションを削除します。
+
+```sh
+kubectl delete -f https://raw.githubusercontent.com/cilium/cilium/1.14.2/examples/minikube/http-sw-app.yaml
+```
+```sh
+service "deathstar" deleted
+deployment.apps "deathstar" deleted
+pod "tiefighter" deleted
+pod "xwing" deleted
 ```
 
