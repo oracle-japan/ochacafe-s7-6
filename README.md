@@ -411,13 +411,13 @@ spec:
 CiliumNetworkPolicies は、「endpointSelector」を使用して Pod のラベルを照合し、ポリシーが適用されるソースと宛先を識別します。上記のポリシーは、ラベル (org=empire) を持つポッドからラベル (org=empire、class=deathstar) を持つ deathstar Pod に TCP ポート 80 で送信されるトラフィックをホワイトリストに登録します。
 
 ```sh
-kubectl create -f https://raw.githubusercontent.com/cilium/cilium/1.14.2/examples/minikube/sw_l3_l4_policy.yaml
+kubectl apply -f https://raw.githubusercontent.com/cilium/cilium/1.14.2/examples/minikube/sw_l3_l4_policy.yaml
 ```
 ```sh
 ciliumnetworkpolicy.cilium.io/rule1 created
 ```
 
-想定通り、tiefighter Pod は、deathstar Pod にアクセスできますが、xwing Pod は悪です出来ません。
+想定通り、tiefighter Pod は、deathstar Pod にアクセスできますが、xwing Pod はアクセス出来ません。
 
 ```sh
 kubectl exec tiefighter -- curl -s -XPOST deathstar.default.svc.cluster.local/v1/request-landing
